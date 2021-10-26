@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Test Task</title>
+</head>
+<body>
+       
+{% if data %}
+<h1>Here is Self Refencing Table</h1>
+<p>I created a single table Sample with join with itself</p>
+{% for parent in data %}
+    <h3>{{ parent.User_Name }}</h3>
+    {% if parent.owner.count %}
+        <ul>
+        {% for child in parent.owner.all %}
+            <li>{{ child.User_Name }}</li>
+                {% if child.owner.count %}
+                    <ul>
+                    {% for child2 in child.owner.all %}
+                        <li>{{ child2.User_Name }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endfor %}
+{% endif %} 
+
+
+{% if userform %}
+<h1>Add Pdf Using Ajax</h1>
+<form action="" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+
+{% for userforms in userform %}
+<div class="form-group">
+    {{userforms.label}}
+    {{userforms}}
+</div>
+{{userforms.errors}}
+{% endfor %}
+<input type="button" id="save_pdf" value="Add pdf" class="btn btn-success float-right" "/>
+</form>
+
+{% endif %}
+
+
+{% if pdf %}
+<table border="1" id="files_data">
+{% for data in pdf %}
+<tr><td>File Name</td><td><a href={{data.Project_Files.path}}>{{data.Project_Files}}</a></td></tr>
+
+
+{% endfor %}
+</table>
+
+{% endif %}
+</body>
+</html>
+
+
+<head>
+
+</head>
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+$(function() {
+    $(document).on("click","#save_pdf",function() {
+        var data = new FormData($('form').get(0));
+
+        var fileExtension = ['pdf'];
+        if ($.inArray($('#id_Project_Files').val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            alert("Only formats are allowed : "+fileExtension.join(', '));
+            return false;
+        }
+
+        $.ajax({
+            url:  "{% url 'showlisting'  %}",
+            type: "POST",
+            data: data,
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#files_data').empty();
+                console.log(data[0]['pk']);
+                $.map( JSON.parse(data), function( val,index ) {
+                    $('#files_data').append('<tr><td>File Name</td><td><a href="">'+val.fields.Project_Files+'</a></td></tr>')
+                console.log(val.fields.Project_Files)
+                });
+            }
+        });
+        return false;
+        });
+});
+</script>

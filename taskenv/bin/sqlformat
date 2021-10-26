@@ -1,0 +1,11 @@
+#!/media/mohit/8c9de0bf-3341-4014-808b-0a49264e0455/delight/testtask/taskenv/bin/python3
+
+# -*- coding: utf-8 -*-
+import re
+import sys
+
+from sqlparse.__main__ import main
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
